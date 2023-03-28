@@ -20,7 +20,7 @@ defmodule Chat.Application do
       ChatWeb.Endpoint,
       # Start a worker by calling: Chat.Worker.start_link(arg)
       # {Chat.Worker, arg}
-      # ChatWeb.Presence
+      ChatWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

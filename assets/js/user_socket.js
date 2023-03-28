@@ -1,4 +1,4 @@
-import { Socket } from "phoenix"
+import { Socket, Presence } from "phoenix"
 
 let socket = new Socket("/socket", { params: { token: window.userToken } })
 
@@ -6,9 +6,21 @@ let chatInput = document.querySelector("#chat-input")
 let messagesContainer = document.querySelector("#messages")
 let userName = document.querySelector("#user-name")
 
+function renderOnlineUsers(presence) {
+  let response = ""
+
+  presence.list((id, {metas: [first, ...rest]}) => {
+    let count = rest.length + 1
+    response += `<br>${id} (count: ${count})</br>`
+  })
+
+  document.querySelector("main").innerHTML = response
+}
+
 socket.connect()
 
 let channel = socket.channel("room:lobby", {})
+let presence = new Presence(channel)
 
 chatInput.addEventListener("keypress", event => {
   if (event.key === 'Enter') {
@@ -23,6 +35,8 @@ channel.on("new_msg", payload => {
   messageItem.innerText = `[${Date()}]: ${payload.user_name}: ${payload.body}`
   messagesContainer.appendChild(messageItem)
 })
+
+presence.onSync(() => renderOnlineUsers(presence))
 
 channel.join()
   .receive("ok", resp => { console.log("Joined successfully", resp) })
